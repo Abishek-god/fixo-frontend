@@ -88,8 +88,9 @@ export default function DashboardPage(){
  async function askAI(){
   if(!prompt.trim()||aiBusy)return;setAiBusy(true);setAnswer("");
   try{
-   const {data,error}=await supabase.functions.invoke("fixo-ai",{body:{messages:[{role:"user",content:prompt}],model:aiModel,task:aiTask}});
-   if(error)throw new Error(error.message||"AI Edge Function request failed.");
+   const res=await fetch("/api/ai/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{role:"user",content:prompt}],model:aiModel,task:aiTask})});
+   const data=await res.json();
+   if(!res.ok)throw new Error(data.error||"AI API request failed.");
    if(data?.error)throw new Error(data.error);
    setAnswer(data.answer+"\n\nModel: "+data.model+(data.fallbackUsed?" (fallback used)":""));
   }catch(e){setAnswer(e instanceof Error?e.message:"Fixo AI unavailable.");}finally{setAiBusy(false);}
