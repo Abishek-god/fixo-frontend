@@ -89,7 +89,16 @@ export default function DashboardPage(){
   if(!prompt.trim()||aiBusy)return;setAiBusy(true);setAnswer("");
   try{
    const {data,error}=await supabase.functions.invoke("fixo-ai",{body:{messages:[{role:"user",content:prompt}],model:aiModel,task:aiTask}});
-   if(error)throw new Error(error.message||"AI Edge Function request failed.");
+   if(error){
+    let message=error.message||"AI Edge Function request failed.";
+    const context=(error as {context?:unknown}).context;
+    if(context instanceof Response){
+     const detail=await context.clone().json().catch(()=>null);
+     if(typeof detail?.error==="string")message=detail.error;
+     else if(typeof detail?.message==="string")message=detail.message;
+    }
+    throw new Error(message);
+   }
    if(data?.error)throw new Error(data.error);
    setAnswer(data.answer+"\n\nModel: "+data.model+(data.fallbackUsed?" (fallback used)":""));
   }catch(e){setAnswer(e instanceof Error?e.message:"Fixo AI unavailable.");}finally{setAiBusy(false);}
