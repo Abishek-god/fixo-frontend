@@ -96,6 +96,8 @@ export default function DashboardPage(){
      const detail=await context.clone().json().catch(()=>null);
      if(typeof detail?.error==="string")message=detail.error;
      else if(typeof detail?.message==="string")message=detail.message;
+     if(typeof detail?.detail==="string"&&detail.detail.trim())message+=" — "+detail.detail.slice(0,400);
+     if(typeof detail?.model==="string")message+=" (model: "+detail.model+")";
     }
     throw new Error(message);
    }
