@@ -12,7 +12,7 @@ const SYMBOLS=[
  {symbol:"SBIN",company:"State Bank of India",exchange:"NSE"},{symbol:"ICICIBANK",company:"ICICI Bank",exchange:"NSE"},
  {symbol:"ITC",company:"ITC Limited",exchange:"NSE"},{symbol:"BHARTIARTL",company:"Bharti Airtel",exchange:"NSE"},
 ];
-type Quote={symbol:string;company:string;price:number;change_percent:number|null;updated_at?:string};
+type Quote={symbol:string;company:string;price:number;change_percent:number|null;market_time?:string;updated_at?:string};
 type Position={id:string;symbol:string;quantity:number;average_price:number};
 type Order={id:string;symbol:string;side:string;quantity:number;price:number;notional:number;created_at:string;status:string};
 type Portfolio={portfolio:{id:string;cash_balance:number;currency:string};positions:Position[];orders:Order[]};
@@ -122,7 +122,7 @@ export default function DashboardPage(){
    <div className="card" id="market"><div className="card-head"><div><h2>Markets</h2><p className="sub">Yahoo Finance data · may be delayed</p></div><label className="market-search"><Search size={14}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search instruments"/></label></div>
     <div className="market-row market-head"><span>Instrument</span><span className="price">Last price</span><span className="change">Change</span><span>Watch</span></div>
     {filtered.map(s=>{const q=quoteMap.get(s.symbol);const watched=watchlist.includes(s.symbol);return <div className="market-row" key={s.symbol}><div><div className="symbol">{s.company}</div><div className="company">{s.symbol} · {s.exchange}</div></div><div className="price">{q?inr(q.price):"—"}</div><div className={"change "+((q?.change_percent||0)>=0?"positive":"negative")}>{q?.change_percent==null?"—":(q.change_percent>=0?"+":"")+q.change_percent.toFixed(2)+"%"}</div><button className="watch-button" onClick={()=>void toggleWatch(s.symbol)}>{watched?"★":"☆"}</button></div>})}
-    <p className="small data-footnote">{quotes[0]?.updated_at?"Last refresh: "+new Date(quotes[0].updated_at).toLocaleString():"No market refresh yet."} · Indicative prices, not executable exchange quotes.</p>
+    <p className="small data-footnote">{quotes[0]?.market_time?"Latest provider price point: "+new Date(quotes[0].market_time).toLocaleString():quotes[0]?.updated_at?"Latest available quote: "+new Date(quotes[0].updated_at).toLocaleString():"No market refresh yet."}{quotes[0]?.updated_at?" · Fetched: "+new Date(quotes[0].updated_at).toLocaleString():""} · Yahoo Finance data may be delayed; prices are indicative, not executable exchange quotes.</p>
    </div>
    <aside className="card" id="trade"><div className="card-head"><div><h2>Paper order</h2><p className="sub">Simulated order execution</p></div><span className="pill">No real money</span></div>
     <div className="trade-toggle"><button className={side==="buy"?"buy-active":""} onClick={()=>setSide("buy")}><ArrowDownLeft size={15}/> Buy</button><button className={side==="sell"?"sell-active":""} onClick={()=>setSide("sell")}><ArrowUpRight size={15}/> Sell</button></div>
