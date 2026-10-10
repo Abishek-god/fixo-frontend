@@ -23,6 +23,31 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/+$/, "");
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+
+  if (!authHeader || !authHeader.toLowerCase().startsWith("bearer ")) {
+    return NextResponse.json({ error: "Sign in to use Fixo AI." }, { status: 401 });
+  }
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json({ error: "Supabase authentication is not configured." }, { status: 503 });
+  }
+
+  let authResponse: Response;
+  try {
+    authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: supabaseKey, Authorization: authHeader },
+      signal: AbortSignal.timeout(10000),
+      cache: "no-store",
+    });
+  } catch {
+    return NextResponse.json({ error: "Could not verify the current session." }, { status: 503 });
+  }
+  if (!authResponse.ok) {
+    return NextResponse.json({ error: "Your session is invalid or expired. Sign in again." }, { status: 401 });
+  }
+
   const baseUrl = process.env.AI_BASE_URL?.trim().replace(/\/+$/, "");
   const apiKey = process.env.AI_API_KEY?.trim();
 
