@@ -88,7 +88,7 @@ export default function DashboardPage(){
  async function askAI(){
   if(!prompt.trim()||aiBusy)return;setAiBusy(true);setAnswer("");
   try{
-   const res=await fetch("/api/ai/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{role:"user",content:prompt}],model:aiModel,task:aiTask})});
+   const res=await fetch("/api/ai/chat",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({messages:[{role:"user",content:prompt}],model:aiModel,task:aiTask})});
    const data=await res.json();
    if(!res.ok)throw new Error(data.error||"AI API request failed.");
    if(data?.error)throw new Error(data.error);
