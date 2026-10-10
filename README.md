@@ -14,10 +14,8 @@ Import this repository with **Root Directory `./`**.
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_FIXO_API_BASE_URL=https://fixo-9uf2.onrender.com`
-- `AI_BASE_URL` (server-only, OpenAI-compatible provider base URL)
-- `AI_API_KEY` (server-only provider key)
 
-Keep AI credentials server-side; never prefix them with `NEXT_PUBLIC_`.
+Do not add AI provider credentials to Vercel. Configure `AI_BASE_URL` and `AI_API_KEY` as secrets for the Supabase Edge Function named `fixo-ai`. The dashboard calls it through `supabase.functions.invoke("fixo-ai", ...)`.
 
 The FastAPI backend remains separately hosted at Render. The backend and Supabase migration/function source are intentionally excluded from this repository.
 
