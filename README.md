@@ -20,3 +20,7 @@ Import this repository with **Root Directory `./`**.
 Keep AI credentials server-side; never prefix them with `NEXT_PUBLIC_`.
 
 The FastAPI backend remains separately hosted at Render. The backend and Supabase migration/function source are intentionally excluded from this repository.
+
+## Build verification
+
+A GitHub Actions workflow named **Frontend Build** runs `npm run build` on pushes and pull requests to `main`. It uses placeholder values for public build-time configuration and does not contain production secrets.
